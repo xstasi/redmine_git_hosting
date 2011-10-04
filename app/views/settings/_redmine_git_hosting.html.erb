@@ -31,6 +31,12 @@
 		<br />
 	</p>
 
+    <p>
+      <label><%= l(:label_git_config_file)%></label>
+      <%= text_field_tag("settings[gitConfigFile]", @settings['gitConfigFile'].split(/[\r\n\t ,;]+/).join("\n"), :size => 60) %>
+               <br />
+    </p>
+
 	<p>
 		<label><%= l(:label_gitolite_identity_file)%></label>
 		<%= text_field_tag("settings[gitoliteIdentityFile]", @settings['gitoliteIdentityFile'], :size => 60) %>
