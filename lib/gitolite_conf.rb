@@ -57,7 +57,7 @@ module GitHosting
 			@original_content = []
 			@repositories = ActiveSupport::OrderedHash.new
 			cur_repo_name = nil
-            File.new(@path, "w") unless File.exists(@path)
+            File.new(@path, "w") unless File.exists?(@path)
 			File.open(@path).each_line do |line|
 				@original_content << line
 				tokens = line.strip.split
