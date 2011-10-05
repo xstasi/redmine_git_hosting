@@ -28,7 +28,7 @@ class GitolitePublicKey < ActiveRecord::Base
 		#
 		# also, it ensures that it is very, very unlikely to conflict with any
 		# existing key name if gitolite config is also being edited manually
-		self.identifier ||= "#{Setting.plugin_redmine_git_hosting['gitIdPrefix'}#{self.user.login.underscore}#{Setting.plugin_redmine_git_hosting['gitIdSuffix']}"
+		self.identifier ||= "#{Setting.plugin_redmine_git_hosting['gitIdPrefix']}#{self.user.login.underscore}#{Setting.plugin_redmine_git_hosting['gitIdSuffix']}"
 	end
 
 	def to_s ; title ; end
