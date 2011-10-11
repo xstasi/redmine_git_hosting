@@ -42,11 +42,7 @@
       <%= text_field_tag("settings[gitIdPrefix]", @settings['gitIdPrefix'].split(/[\r\n\t ,;]+/).join("\n"), :size => 60) %>
                <br />
     </p>
-    <p>
-      <label><%= l(:label_git_id_suffix)%></label>
-      <%= text_field_tag("settings[gitIdSuffix]", @settings['gitIdSuffix'].split(/[\r\n\t ,;]+/).join("\n"), :size => 60) %>
-               <br />
-    </p>
+
     <p>
       <label><%= l(:label_git_admin_user)%></label>
       <%= text_field_tag("settings[gitAdminUser]", @settings['gitAdminUser'].split(/[\r\n\t ,;]+/).join("\n"), :size => 60) %>
