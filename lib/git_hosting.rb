@@ -376,7 +376,7 @@ module GitHosting
 
 
 			local_dir = get_tmp_dir()
-			conf = GitoliteConfig.new(File.join(local_dir, 'gitolite-admin', 'conf', Setting.                                           plugin_redmine_git_hosting['gitConfigFile']))
+			conf = GitoliteConfig.new(File.join(local_dir, 'gitolite-admin', 'conf', Setting.plugin_redmine_git_hosting['gitConfigFile']))
 			orig_repos = conf.all_repos
 			new_repos = []
 			new_projects = []
