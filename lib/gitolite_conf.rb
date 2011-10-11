@@ -89,7 +89,7 @@ module GitHosting
 			# any permission anyway, this isn't really a security risk.
 			# If no users are defined, this ensures the repo actually
 			# gets created, hence it's necessary.
-			admin_user = Setting.plugin_redmine_git_hosting['gitAdminUser']
+			admin_user = @repositories["gitolite-admin"].rights["RW+".to_sym][0]
 			@repositories.each do |repo, rights|
 				content << "repo\t#{repo}"
 				has_users=false

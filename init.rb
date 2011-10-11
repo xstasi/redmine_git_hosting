@@ -17,7 +17,6 @@ Redmine::Plugin.register :redmine_git_hosting do
 		'gitServer' => 'localhost',
 		'gitUser' => 'git',
 		'gitConfigFile' => 'gitolite.conf',
-		'gitAdminUser' => 'git-admin',
 		'gitIdPrefix' => 'redmine_',
 		'gitRepositoryBasePath' => 'repositories/',
 		'gitoliteIdentityFile' => RAILS_ROOT + '/.ssh/gitolite_admin_id_rsa',
