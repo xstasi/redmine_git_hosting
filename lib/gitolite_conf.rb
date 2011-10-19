@@ -1,5 +1,32 @@
 module GitHosting
 	class GitoliteConfig
+		
+		def get_admin_user_key
+			dir_path = file_path
+			dir_path = file_path.gsub(/[^\/]*$/)
+			glob_files = Dir.glob("#{dir_path}/*")
+			glob_files.unshift("#{dir_path}/gitolite.conf")
+			admin_user = ""
+			for file_path in @files
+				file = File.new(file_path, "r")
+				while (line = file.gets)
+					if(line.match(/^repo[\t ]+gitolite\-admin[\t ]*$/))
+						if(line = file.gets)
+							if(line.match(/^[\t ]*RW\+[\t ]*=[\t ]*/))
+								users=line.gsub(/^[\t ]*RW\+[\t ]*=[\t ]*/, "").split(/[\t ]+/)
+								admin_user = users[0]
+							end
+						end
+					end
+				end
+				file.close
+				if admin_user != ""
+					break;
+				end
+			end
+			return admin_user
+		end
+		
 		def initialize file_path
 			@path = file_path
 			load
@@ -57,7 +84,7 @@ module GitHosting
 			@original_content = []
 			@repositories = ActiveSupport::OrderedHash.new
 			cur_repo_name = nil
-            File.new(@path, "w") unless File.exists?(@path)
+			File.new(@path, "w") unless File.exists?(@path)
 			File.open(@path).each_line do |line|
 				@original_content << line
 				tokens = line.strip.split
@@ -89,7 +116,7 @@ module GitHosting
 			# any permission anyway, this isn't really a security risk.
 			# If no users are defined, this ensures the repo actually
 			# gets created, hence it's necessary.
-			admin_user = @repositories["gitolite-admin"].rights["RW+".to_sym][0]
+			admin_user = get_admin_user_key
 			@repositories.each do |repo, rights|
 				content << "repo\t#{repo}"
 				has_users=false
