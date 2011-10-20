@@ -1,35 +1,13 @@
 module GitHosting
 	class GitoliteConfig
-		
-		def get_admin_user_key
-			dir_path = file_path
-			dir_path = file_path.gsub(/[^\/]*$/)
-			glob_files = Dir.glob("#{dir_path}/*")
-			glob_files.unshift("#{dir_path}/gitolite.conf")
-			admin_user = ""
-			for file_path in @files
-				file = File.new(file_path, "r")
-				while (line = file.gets)
-					if(line.match(/^repo[\t ]+gitolite\-admin[\t ]*$/))
-						if(line = file.gets)
-							if(line.match(/^[\t ]*RW\+[\t ]*=[\t ]*/))
-								users=line.gsub(/^[\t ]*RW\+[\t ]*=[\t ]*/, "").split(/[\t ]+/)
-								admin_user = users[0]
-							end
-						end
-					end
-				end
-				file.close
-				if admin_user != ""
-					break;
-				end
-			end
-			return admin_user
-		end
+		@admin_user_key = nil
+		@path = nil
+
 		
 		def initialize file_path
 			@path = file_path
-			load
+			load_repos
+			@admin_user_key = get_admin_user_key
 		end
 
 		def save
@@ -80,7 +58,7 @@ module GitHosting
 
 
 		private
-		def load
+		def load_repos
 			@original_content = []
 			@repositories = ActiveSupport::OrderedHash.new
 			cur_repo_name = nil
@@ -101,6 +79,43 @@ module GitHosting
 			@original_content = @original_content.join
 		end
 
+		def get_admin_user_key
+			admin_user_key = nil
+			begin
+				admin_user_key = @repositories["gitolite-admin"].rights["RW+".to_sym][0]
+			rescue
+				admin_user_key = nil
+			end
+			if admin_user_key == nil
+				dir_path = @path
+				dir_path = file_path.gsub(/[^\/]*$/)
+				glob_files = Dir.glob("#{dir_path}/*").reject { |fileName| fileName.match(/gitolite\.conf$/) }
+				glob_files.unshift("#{dir_path}/gitolite.conf")
+				admin_user_key = ""
+				for file_path in @files
+					file = File.new(file_path, "r")
+					while (line = file.gets)
+						if(line.match(/^repo[\t ]+gitolite\-admin[\t ]*$/))
+							if(line = file.gets)
+								if(line.match(/^[\t ]*RW\+[\t ]*=[\t ]*/))
+									user_keys=line.gsub(/^[\t ]*RW\+[\t ]*=[\t ]*/, "").split(/[\t ]+/)
+									admin_user_key = user_keys[0]
+								end
+							end
+						end
+					end
+					file.close
+					if admin_user_key != ""
+						break;
+					end
+				end
+			end
+			admin_user_key
+		end
+
+
+
+
 		def repository repo_name
 			@repositories[repo_name] ||= GitoliteAccessRights.new
 		end
@@ -116,7 +131,6 @@ module GitHosting
 			# any permission anyway, this isn't really a security risk.
 			# If no users are defined, this ensures the repo actually
 			# gets created, hence it's necessary.
-			admin_user = get_admin_user_key
 			@repositories.each do |repo, rights|
 				content << "repo\t#{repo}"
 				has_users=false
@@ -127,7 +141,7 @@ module GitHosting
 					end
 				end
 				if !has_users
-					content << "\tR\t=\t#{admin_user}"
+					content << "\tR\t=\t#{@admin_user_key}"
 				end
 				content << ""
 			end
