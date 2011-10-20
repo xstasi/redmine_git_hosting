@@ -11,10 +11,11 @@ module GitHosting
 		end
 
 		def save
-			File.open(@path, "w") do |f|
-				f.puts content
-			end
 			@original_content = content
+			File.open(@path, "w") do |f|
+				f.puts @original_content
+			end
+			ensure_config_included
 		end
 
 		def add_write_user repo_name, users
@@ -56,6 +57,30 @@ module GitHosting
 			return repos
 		end
 
+		def ensure_config_included
+			load_config_file = @path.gsub(/^.*\//, "")
+			if(load_config_file != "gitolite.conf")
+				
+				include_found = false
+				gitolite_path = @path.gsub(/[^\/]*$/,"") + "gitolite.conf"
+				gitolite_conf_lines = []
+				File.open(gitolite_path).each_line do |line|
+					gitolite_conf_lines.push(line)
+					include_found = line.match(/^[\t ]*include[\t \"\']+#{load_config_file}[\r\n\t \"\']*$/)
+					if include_found
+						break
+					end
+				end
+
+				if !include_found
+					File.open(gitolite_path, "w") do |file|
+						file.puts "include \"#{load_config_file}\""
+						file.print gitolite_conf_lines.join("") 
+					end
+				end
+			end
+		end
+
 
 		private
 		def load_repos
@@ -88,7 +113,7 @@ module GitHosting
 			end
 			if admin_user_key == nil
 				dir_path = @path
-				dir_path = file_path.gsub(/[^\/]*$/)
+				dir_path = file_path.gsub(/[^\/]*$/,"")
 				glob_files = Dir.glob("#{dir_path}/*").reject { |fileName| fileName.match(/gitolite\.conf$/) }
 				glob_files.unshift("#{dir_path}/gitolite.conf")
 				admin_user_key = ""
@@ -119,6 +144,8 @@ module GitHosting
 		def repository repo_name
 			@repositories[repo_name] ||= GitoliteAccessRights.new
 		end
+
+
 
 
 		def content
