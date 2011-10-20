@@ -112,12 +112,11 @@ module GitHosting
 				admin_user_key = nil
 			end
 			if admin_user_key == nil
-				dir_path = @path
-				dir_path = file_path.gsub(/[^\/]*$/,"")
-				glob_files = Dir.glob("#{dir_path}/*").reject { |fileName| fileName.match(/gitolite\.conf$/) }
+				dir_path = @path.gsub(/[^\/]*$/,"")
+				glob_files = Dir.glob("#{dir_path}/*").reject { |file_path| file_path.match(/gitolite\.conf$/) }
 				glob_files.unshift("#{dir_path}/gitolite.conf")
 				admin_user_key = ""
-				for file_path in @files
+				glob_files.each do |file_path|
 					file = File.new(file_path, "r")
 					while (line = file.gets)
 						if(line.match(/^repo[\t ]+gitolite\-admin[\t ]*$/))
