@@ -123,28 +123,7 @@ module GitHosting
 		return File.join(Setting.plugin_redmine_git_hosting['gitRepositoryBasePath'], repository_name(project)) + ".git"
 	end
 
-	def self.add_route_for_project(p)
 
-		if defined? map
-			add_route_for_project_with_map p, map
-		else
-			ActionController::Routing::Routes.draw do |map|
-				add_route_for_project_with_map p, map
-			end
-		end
-	end
-	def self.add_route_for_project_with_map(p,m)
-		repo = p.repository
-		if repo.is_a?(Repository::Git)
-			repo_name= p.parent ? File.join(GitHosting::get_full_parent_path(p, true),p.identifier) : p.identifier
-			repo_path = repo_name + ".git"
-			m.connect repo_path,                  :controller => 'git_http', :p1 => '', :p2 =>'', :p3 =>'', :id=>"#{p[:identifier]}", :path=>"#{repo_path}"
-			m.connect repo_path,                  :controller => 'git_http', :p1 => '', :p2 =>'', :p3 =>'', :id=>"#{p[:identifier]}", :path=>"#{repo_path}"
-			m.connect repo_path + "/:p1",         :controller => 'git_http', :p2 => '', :p3 =>'', :id=>"#{p[:identifier]}", :path=>"#{repo_path}"
-			m.connect repo_path + "/:p1/:p2",     :controller => 'git_http', :p3 => '', :id=>"#{p[:identifier]}", :path=>"#{repo_path}"
-			m.connect repo_path + "/:p1/:p2/:p3", :controller => 'git_http', :id=>"#{p[:identifier]}", :path=>"#{repo_path}"
-		end
-	end
 	def self.get_tmp_dir
 		@@git_hosting_tmp_dir ||= File.join(Dir.tmpdir, "redmine_git_hosting")
 		if !File.directory?(@@git_hosting_tmp_dir)
@@ -396,7 +375,6 @@ module GitHosting
 					#check whether we're adding a new repo
 					if orig_repos[ repo_name ] == nil
 						changed = true
-						add_route_for_project(project)
 						new_repos.push repo_name
 						new_projects.push project
 
