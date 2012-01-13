@@ -14,23 +14,23 @@ class GitHostingObserver < ActiveRecord::Observer
 
 	def self.set_update_active(is_active)
 		if !is_active
-                	@@updating_active_stack += 1
-                else
-                	@@updating_active_stack -= 1
-                        if @@updating_active_stack < 0
-                        	@@updating_active_stack = 0
-                        end
-                end
+			@@updating_active_stack += 1
+		else
+			@@updating_active_stack -= 1
+			if @@updating_active_stack < 0
+				@@updating_active_stack = 0
+			end
+		end
 
 		if is_active && @@updating_active_stack == 0
 			if @@cached_project_updates.length > 0
 				@@cached_project_updates = @@cached_project_updates.flatten.uniq.compact
 				GitHosting::update_repositories(@@cached_project_updates, false)
-                        	@@cached_project_updates = []
+				@@cached_project_updates = []
 			end
-                	@@updating_active = true
-                else
-                	@@updating_active = false
+			@@updating_active = true
+		else
+			@@updating_active = false
 		end
 	end
 
