@@ -16,7 +16,7 @@ class GitHttpController < ApplicationController
 			project = Project.find_by_identifier(proj_id)
 			@git_http_repo_path = project_path = proj_path_split[1]
 
-		  	if GitHosting.http_access_url(project) == project_path
+		  	if Redmine::Utils::relative_url_root + GitHosting.repository_name(project) ==  project_path
 				p1 = params[:path][0] || ""
 				p2 = params[:path][1] || ""
 				p3 = params[:path][2] || ""
