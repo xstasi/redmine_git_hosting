@@ -147,7 +147,7 @@ module GitHosting
 	end
 	def self.get_tmp_dir
 	  tmp_dir = Setting.plugin_redmine_git_hosting['gitTmpDir']
-	  @@git_hosting_tmp_dir = tmp_dir.empty? : nil ? tmp_dir
+	  @@git_hosting_tmp_dir = tmp_dir.empty? ? nil : tmp_dir
 		@@git_hosting_tmp_dir ||= File.join(Dir.tmpdir, "redmine_git_hosting")
 		if !File.directory?(@@git_hosting_tmp_dir)
 			%x[mkdir -p "#{@@git_hosting_tmp_dir}"]
