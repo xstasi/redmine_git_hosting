@@ -47,6 +47,11 @@
 		<%= text_field_tag("settings[gitRepositoryBasePath]", @settings['gitRepositoryBasePath'], :size => 60) %>
 		<br />
 	</p>
+	<p>
+		<label><%= l(:label_git_repository_tmp_dir)%></label>
+		<%= text_field_tag("settings[gitTmpDir]", @settings['gitTmpDir'], :size => 60) %>
+		<br />
+	</p>
 
 
 	<h3><%= l(:label_git_cache_parameters)%></h3>
