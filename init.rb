@@ -8,15 +8,22 @@ require File.join(File.dirname(__FILE__), 'app', 'models', 'git_cia_notification
 
 Redmine::Plugin.register :redmine_git_hosting do
 	name 'Redmine Git Hosting Plugin'
-	author 'Eric Bishop, Pedro Algarvio, Christian Käser, Zsolt Parragi, Yunsang Choi, Joshua Hogendorn, Jan Schulz-Hofen and others'
+	author 'Eric Bishop, Pedro Algarvio, Christian Käser, Zsolt Parragi, Yunsang Choi, Joshua Hogendorn, Jan Schulz-Hofen, John Kubiatowicz and others'
 	description 'Enables Redmine / ChiliProject to control hosting of git repositories'
-	version '0.4.2'
+	version '0.4.3x'
 	url 'https://github.com/ericpaulbishop/redmine_git_hosting'
+
 	settings :default => {
 		'httpServer' => 'localhost',
+    		'httpServerSubdir' => '',
 		'gitServer' => 'localhost',
 		'gitUser' => 'git',
 		'gitRepositoryBasePath' => 'repositories/',
+    		'gitRedmineSubdir' => '',
+    		'gitRepositoryHierarchy' => 'true',
+    		'gitRecycleBasePath' => 'recycle_bin/',
+    		'gitRecycleExpireTime' => '24.0',
+    		'gitLockWaitTime' => '10',
 		'gitoliteIdentityFile' => RAILS_ROOT + '/.ssh/gitolite_admin_id_rsa',
 		'gitoliteIdentityPublicKeyFile' => RAILS_ROOT + '/.ssh/gitolite_admin_id_rsa.pub',
 		'allProjectsUseGit' => 'false',
@@ -65,6 +72,22 @@ Dispatcher.to_prepare :redmine_git_patches do
   require_dependency 'repository/git'
   require 'git_hosting/patches/git_repository_patch'
   Repository::Git.send(:include, GitHosting::Patches::GitRepositoryPatch)
+
+  require_dependency 'sys_controller'
+  require 'git_hosting/patches/sys_controller_patch'
+  SysController.send(:include, GitHosting::Patches::SysControllerPatch)
+
+  require_dependency 'members_controller'
+  require 'git_hosting/patches/members_controller_patch'
+  MembersController.send(:include, GitHosting::Patches::MembersControllerPatch)
+
+  require_dependency 'users_controller'
+  require 'git_hosting/patches/users_controller_patch'
+  UsersController.send(:include, GitHosting::Patches::UsersControllerPatch)
+
+  require_dependency 'roles_controller'
+  require 'git_hosting/patches/roles_controller_patch'
+  RolesController.send(:include, GitHosting::Patches::RolesControllerPatch)
 
   require_dependency 'git_hosting/patches/repository_cia_filters'
 end
